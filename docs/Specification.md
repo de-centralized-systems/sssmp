@@ -33,7 +33,7 @@ consolidate community best practices, foster public review as well as contributi
 motivate the creation of official standards based on the here provided material. 
 
 Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at
-[Github](https://github.com/de-centralized-systems/SSMP).
+[Github](https://github.com/de-centralized-systems/sssmp).
 
 ## Copyright Notice
 
@@ -536,7 +536,7 @@ Feel free to contact us if you have also implemented the specification and want 
  page.
 
 #### Reference implementation
-The [reference implementation](https://github.com/de-centralized-systems/sssmp/sssmp) can be found in the Github repository of the specification.
+The [reference implementation](https://github.com/de-centralized-systems/sssmp/blob/main/sssmp) can be found in the Github repository of the specification.
 
 #### BIP39 Toolkit
 An implementation which uses SSSMP as a component is the 

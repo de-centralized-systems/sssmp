@@ -19,11 +19,11 @@ checksum mechanism, to the original secret sharing approach described by
 
 ## Specification
 
-The specification is maintained [here](https://github.com/de-centralized-systems/sssmp/docs/Specification.md), and an html export can be viewed [here on github.io](https://de-centralized-systems.github.io/sssmp/). 
+The specification is maintained [here](https://github.com/de-centralized-systems/sssmp/blob/main/docs/Specification.md), and an html export can be viewed [here on github.io](https://de-centralized-systems.github.io/sssmp/). 
 
 ## Reference Implementation
 
-The reference implementation as well as all test vectors can be found [here](https://github.com/de-centralized-systems/sssmp/sssmp).
+The reference implementation as well as all test vectors can be found [here](https://github.com/de-centralized-systems/sssmp/blob/main/sssmp).
 
 ## License 
 
