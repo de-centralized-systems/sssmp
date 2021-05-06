@@ -23,7 +23,7 @@ The specification is maintained [here](https://github.com/de-centralized-systems
 
 ## Reference Implementation
 
-The reference implementation as well as all test vectors can be found [here](https://github.com/de-centralized-systems/sssmp/blob/main/sssmp).
+The reference implementation as well as all test vectors can be found [here](https://github.com/de-centralized-systems/sssmp/blob/main/src).
 
 ## License 
 

@@ -536,7 +536,7 @@ Feel free to contact us if you have also implemented the specification and want 
  page.
 
 #### Reference implementation
-The [reference implementation](https://github.com/de-centralized-systems/sssmp/blob/main/sssmp) can be found in the Github repository of the specification.
+The [reference implementation](https://github.com/de-centralized-systems/sssmp/blob/main/src) can be found in the Github repository of the specification.
 
 #### BIP39 Toolkit
 An implementation which uses SSSMP as a component is the 
