@@ -4,14 +4,15 @@
 Authors: Aljosha Judmayer, Philipp Schindler  
 Status: DRAFT  
 Version: 0.1  
-Last revision: 2021-05-06  
-Initial release: -
+Last revision: 2021-05-07  
+Initial release: -  
+
+<!-- Ensure the above lines are terminated with two spaces to insert the desired line breaks. -->
 
 ## Abstract 
 
-The document describes a secret sharing scheme with a particular focus on the use  
-case of sharing random mnemonic phrases, as for example used within hierarchical deterministic wallets in context of 
-cryptocurrencies.
+The document describes a secret sharing scheme with a particular focus on the use case of sharing random mnemonic 
+phrases, as for example used within hierarchical deterministic wallets in context of cryptocurrencies.
 With this focus in mind, this specification is designed to be fully compatible with existing encodings of mnemonic 
 phrases, in particular [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki).
 It can be used to split a given (already existing) BIP39 mnemonic phrase of 12, 15, 18, 21, or 24 words, 
@@ -24,7 +25,7 @@ Alternative encodings such as, e.g.,
 may be used instead of BIP39.
 The design is intentionally kept as simple as possible, and only adds minor modifications, in particular an integrated 
 checksum mechanism, to the original secret sharing approach described by 
-[Shamir](https://dl.acm.org/doi/pdf/10.1145/359168.359176).
+[Shamir (1979)](https://dl.acm.org/doi/pdf/10.1145/359168.359176).
 
 ## Status of This Memo
 
@@ -33,7 +34,7 @@ consolidate community best practices, foster public review as well as contributi
 motivate the creation of official standards based on the here provided material. 
 
 Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at
-[Github](https://github.com/de-centralized-systems/sssmp).
+[https://github.com/de-centralized-systems/sssmp](https://github.com/de-centralized-systems/sssmp).
 
 ## Copyright Notice
 
@@ -67,13 +68,13 @@ of managing and deriving cryptographic key material.
 This should provide the necessary bigger picture and define the context in which this specification has to be 
 interpreted. 
 The aim of this document is it to specify a minimalistic and interoperable method for the secret sharing of 
-cryptographic key material intended 
-for manual/human processing, e.g., as used in private offline/paper backups of mnemonic seed phrases. 
+cryptographic key material intended for manual/human processing, e.g., as used in private offline/paper backups of 
+mnemonic seed phrases. 
 
 ### <a name="Scope"></a>Scope, Goals and Non-goals
 
-To describe the scope of this document, the relation to other processing steps in deriving and managing cryptographic 
-key material has to be outlined. 
+To clarify the scope of this document, the relation to other processing steps in deriving and managing cryptographic 
+key material is outlined in the following.
 
 * **Generation of a cryptographic key**
 At this point a new key $s$ is generated from a cryptographically secure source of randomness. 
@@ -85,15 +86,15 @@ applied to a key $s$.
 * **Derivation of a cryptographic key**
 A generated, or derived, key $s$ can be used to derive one or multiple further keys from the input key according to a 
 specified scheme like for example [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki).
-or [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki). The resulting key is then called 
-*derived key*. 
+or [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki). 
+The resulting key is then called *derived key*. 
 This step is not within the scope of this document and MAY have taken place before the here specified scheme can be 
 applied to a derived key $s$. 
 
 * **Hidden derivation of a cryptographic key**
 A hidden derivation step can be applied to a generated, or derived, key $s_1$ to allow for hidden derivation paths, 
 plausible deniability through multiple derivation paths, or prevent the computation of subsequent derivation steps in 
-the key hierarchy, 
+the key hierarchy. 
 Therefore, this step requires an additional secret/key $s_2$ as input, like for example a passphrase as in 
 [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). 
 The additional user supplied passphrase is then used as a message in PBKDF2 with the reconstructed secret as password.
@@ -102,27 +103,26 @@ For example, such a step can be applied after a secret has been reconstructed an
 derivation steps.
 
 * **Mnemonic encodeing/decodeing of a cryptographic key**
-A generated, or derived, key $s$ can be represented as a mnemonic phrase to improve human readability and easer manual 
-copying of key material or key shares. Example for such schemes are 
+A generated or derived key $s$ can be represented as a mnemonic phrase to improve human readability and easer manual 
+copying of key material or key shares. 
+Example for such schemes are 
 [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki), or 
 [bytewords](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-012-bytewords.md).
 This step is out-of-scope of this document and such techniques SHOULD be used in combination with the here specified 
 scheme. 
 
 * **Secret sharing of a cryptographic key**
-A generated, or derived, key $s$ is shared amongst a set of $n$ participants, where $t$ should be able to reconstruct 
+A generated or derived key $s$ is shared amongst a set of $n$ participants, where $t$ should be able to reconstruct 
 the original key $s$. 
 In this specification we focus exclusively on this step.
 
 #### Goals
-+ Simple scheme compatible with the reconstruction of classical Shamir Secret Sharing (SSS)
-+ Additional checksum for detecting invalid reconstructions without further derivations of key material 
+- Simple scheme compatible with the reconstruction of classical Shamir Secret Sharing (SSS).
+- Additional checksum for detecting invalid reconstructions without further derivations of key material.
 
 #### Non-Goals 
-- Specification of how the input key $s$ has to be contacted, despite the requirement that is has to be of 
-  high-min-entropy. 
-- Specification of a concrete key length despite enforcing a minimum of 128 bit. 
-- Specification of mnemonic encoding used for input and output data
+- Specification of how the input key $s$ has to be created, despite enforcing a minimum of 128 bit. 
+- Specification of mnemonic encoding used for input and output data.
 - Specification of further hidden derivation steps for plausible deniability or and additional layers of security. 
 
 ### Background
@@ -178,7 +178,7 @@ used to recover the shared value.
    $(x_i, y_i)$ consisting of the share index $x_i = i$ (an integer from $1$ to $255$) and the share value $y_i$ 
    (a sequence of $b$ bytes).
 
-Note that typical values for $n$ and $t$ are in the range $2 \leq t \leq 255$ .
+Note that typical values for $n$ and $t$ are in the range of $2 \leq t \leq 255$ .
 If $t = 1$, the number of shares required for the recovery is one.
 In this case, each share created is just the value being shared.
 If $t = n$, all created shares are required for the recovery process.
@@ -237,12 +237,13 @@ obtained by evaluating the secret sharing polynomials and concatenating the resu
 The only difference to Shamir's original secret sharing is the definition of coefficient $c_{t - 1}$.
 In Shamir's original description, all coefficients $c_j \mid 0 < j < t$ are selected at random, 
 whereas in our approach all but the last $8$ bytes of the list of coefficients $c_{t - 1}$ are selected at random, 
-whereas the last $8$ bytes are pseudo-randomly derived from the secret $s$ and all but the last $8$ bytes using an HMAC.
+whereas the last $8$ bytes are pseudo-randomly derived from the secret $s$ and all but the last $8$ bytes of 
+$c_{t - 1}$ using an HMAC.
 
 
 ## <a name="Recovery"></a>Recovery
 
-This section describes how to reconstruct a secret, from a set of $t$ given shares, 
+This section describes how to reconstruct a secret from a set of $t$ given shares, 
 computed with the method specified in [Section Sharing](#Sharing).
 Implementations MUST be able to successfully recover the shared secret $s$, if all given shares are 
 *valid* and a *sufficient number* of shares is provided. 
@@ -273,7 +274,7 @@ and display a corresponding error message in the following cases:
    This is the case if there is a share value of less than $16$ bytes in length,
    or if the share length across the shares is inconsistent (i.e., different) for two or more shares.
 
-If the inputs are successfully validated according to this plausibility checks, 
+If the inputs are successfully validated according to these plausibility checks, 
 implementations attempt to recover the shared secret $s$ from the given set of shares $\{s_1, s_2, \dots, s_t\}$.
 For this purpose the underlying secret sharing polynomials $f_k(\cdot)$ 
 are evaluated using the Lagrange interpolation formula: 
@@ -322,8 +323,8 @@ for each byte in the list of coefficients $c_{t - 1}$ using $k$ as index variabl
 $$
   c_{t - 1}[k] = [x_0, x_1, \dots, x_{t - 1}] f_k\ \quad 0 \leq k < b.
 $$
-Here, $[x_0, x_1, \dots, x_{t - 1}] f_k$ denotes the dividing difference of the secret sharing polynomial $f_k$ and is 
-recursively defined as given below:
+Here, $[x_0, x_1, \dots, x_{t - 1}] f_k$ denotes the dividing difference of the secret sharing polynomial $f_k(\cdot)$ 
+and is recursively defined as given below:
 $$
   [x_i] f_k = y_i[k]
 $$
@@ -349,9 +350,13 @@ Otherwise the user MUST be informed of the failed recovery attempt.
 In this case, implementations MAY choose to return the recovery secret $s$ anyway, but they MUST NOT do so without
 provided the user with a clear indication of the failed checksum verification.
 
+
+## Design and Security Considerations
+
 ### Metadata
 
-Besides $t$ share values with their associated indices, nothing is needed to reconstruct the previously shared secret.
+Besides a set of at least $t$ valid shares with their associated indices, no additional data is needed to reconstruct 
+the previously shared secret.
 Although, for practical purposes it is RECOMMENDED that implementations also generate a unique ID which represents the 
 individual secret sharing session. 
 
@@ -363,14 +368,11 @@ Note that, if shares of multiple different sessions with large $n$ values get mi
 situation where it is no longer computationally feasible to perform a brute-force search to find the valid combinations 
 which allow for the reconstruction of the original secrets. 
 
-
-## Design and Security Considerations
-
 ### Minimal secret size and intended use case
 
 The minimal input size of the secret to be shared with the secret sharing mechanism specified in this document is 
 limited to $128$ bits ($16$ bytes). 
-This is equivalent to the lower bound for cryptographic secrets consider by a range of other designs in this field.
+This is equivalent to the lower bound for cryptographic secrets considered by a range of other designs in this field.
 Any implementation of this specification MUST NOT allow secrets smaller than this size to be shared.
 In contrast to Shamir's original secret sharing description, which provides information theoretic security, 
 our variant (due to the inclusion of an integrated checksum) is not designed for sharing low-entropy secrets and 
@@ -457,7 +459,7 @@ $$
 For $q = 100$ for example, this results in a probability of $\approx 2.68 \cdot 10^{-16}$.
 
 
-### Multi layer/ Recursive use
+### Multi layer / Recursive use
 
 The specification implicitly covers the use case of sharing the same secret 
 among different (independent) groups of stakeholders
@@ -468,7 +470,7 @@ the [SLIP39](https://github.com/satoshilabs/slips/blob/master/slip-0039.md) prop
 deliberately do not complicate this specification by introducing additionally a notation for groups to explicitly 
 capture such use cases.
 Yet, our specification transparently allows to re-share the shares for a given secret in a natural way: 
-It is simply accomplished by feeding a share, which should be further split up, as secret into the secret sharing 
+This is simply accomplished by feeding a share, which should be further split up, as secret into the secret sharing 
 procedure.
 While special care must be taken to ensure that the way secrets are shared and may later be recombined is noted, 
 our approach in principle allows for an arbitrary number of nested secret sharing layers.
@@ -485,8 +487,12 @@ where human interaction is involved.
 
 ## Test vectors
 
-The files `test_vectors.json` and `test_vectors.py` in this directory contain a list of secret sharing computation 
-performed with the reference implementation.
+The files 
+[`test_vectors.json`](https://github.com/de-centralized-systems/sssmp/blob/main/src/test_vectors.json) and 
+[`test_vectors.py`](https://github.com/de-centralized-systems/sssmp/blob/main/src/test_vectors.py) in 
+[`./src`](https://github.com/de-centralized-systems/sssmp/blob/main/src) directory of the 
+[Github repository](https://github.com/de-centralized-systems/sssmp)
+of this specification contain a list of secret sharing computation performed with the reference implementation.
 An example test vector is given below:
 ```json
 {
@@ -507,10 +513,10 @@ An example test vector is given below:
     ]
 },
 ```
-The test vectors include example secret sharing for all values of $1 \leq t \leq n \leq 5$.
+The test vectors include secret sharing examples for all values of $1 \leq t \leq n \leq 5$.
 As the secret sharing process is inherently randomized, the values of the coefficients used for the secret sharing 
 process are given in the test vectors.
-This allows other implementation to check if the secret sharing leds to the expected shares for the given coefficients.
+This allows other implementation to check if the secret sharing leads to the expected shares for the given coefficients.
 The last 8 bytes of the coefficients in the test vectors are computed according to this specification and can be used
 to check the correctness of the checksum computation.
 Implementations MUST NOT use the provided values for purposes other than testing the correctness of the implementation.
@@ -536,7 +542,9 @@ Feel free to contact us if you have also implemented the specification and want 
  page.
 
 #### Reference implementation
-The [reference implementation](https://github.com/de-centralized-systems/sssmp/blob/main/src) can be found in the Github repository of the specification.
+The reference implementation can be found in the 
+[`./src`](https://github.com/de-centralized-systems/sssmp/blob/main/src) directory of the
+[Github repository](https://github.com/de-centralized-systems/sssmp) of this specification.
 
 #### BIP39 Toolkit
 An implementation which uses SSSMP as a component is the 
@@ -549,7 +557,7 @@ Moreover it supports the generation of cryptographic keys from scratch.
 ## References  
 
  - [BIP39 Toolkit](https://github.com/de-centralized-systems/bip39toolkit), 
-   our reference implementation for this specification using BIP39 as encoding
+   our implementation of this specification using BIP39 as encoding
  - [Shamir's Original Paper "How to share a Secret"](https://dl.acm.org/doi/pdf/10.1145/359168.359176)
  - [Wikipedia Page on Finite Field Arithmetics](https://en.wikipedia.org/wiki/Finite_field_arithmetic)
  - [BIP39 Specification "Mnemonic code for generating deterministic keys"](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki)
@@ -560,7 +568,7 @@ Moreover it supports the generation of cryptographic keys from scratch.
 
 ## Version History
 
-**2021-05-06**
+**2021-05-07**
  - Initial draft published on Github.
 
 
