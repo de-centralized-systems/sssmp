@@ -1,19 +1,24 @@
-import secrets
+""" Reference implementation of the Shamir Secret Sharing for Mnemonic Phrases (SSSMP) specification.
+The implemenation is designed to be minimalistic, and closely resembles the specification.
+See also: https://de-centralized-systems.github.io/sssmp/
+"""
+
 import hmac
+import secrets
 
 from typing import List, Optional, Sequence, Tuple
 
-from . import GF256
+import GF256
 
 
 def random(b: int) -> bytes:
-    """ Helper function to create a sequence of `b` random bytes using cryptographically secure source of randomness.
+    """ Helper function to create a sequence of `b` random bytes using a cryptographically secure source of randomness.
     """
     return secrets.token_bytes(b)
 
 
 def coefficients_with_checksum(s: bytes, r: bytes) -> bytes:
-    """ Helper function to compute a list of coefficient with the included checksum.
+    """ Helper function to compute a list of coefficients with the included checksum.
     """
     return r + hmac.new(key=s, msg=b"secret sharing coefficient" + r, digestmod="sha256").digest()[:8]
 
@@ -63,7 +68,7 @@ def recover(shares: Sequence[Tuple[int, bytes]]) -> bytes:
 
     b = len(shares[0][1])
     if b < 16:
-        raise ValueError("Invalid shares provided, share length below the minimum 16 bytes (128 bits).")
+        raise ValueError("Invalid shares provided, share length below the minimum of 16 bytes (128 bits).")
     if any(len(yi) != b for _, yi in shares):
         raise ValueError("Invalid shares provided, share lengths are inconsistent.")
 
@@ -85,8 +90,8 @@ def recover(shares: Sequence[Tuple[int, bytes]]) -> bytes:
 
 
 def verify_checksum(s: bytes, shares: Sequence[Tuple[int, bytes]]):
-    """Verifies the checksum integrated into the last coefficients of the secret sharing polynomials. Returns True if 
-    the checksum is found valid and False otherwise.
+    """Verifies the checksum integrated into the last coefficients of the secret sharing polynomials. Returns `True` if 
+    the checksum is found valid and `False` otherwise.
     """
     if len(shares) == 1:
         return True

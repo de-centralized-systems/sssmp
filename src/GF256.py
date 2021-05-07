@@ -1,9 +1,9 @@
-from typing import Sequence
+from typing import Sequence, Union
 
 
 def add(a: int, b: int) -> int:
     """Implements addition of `a` and b` in GF256.
-    Added here for reference only. Addition is always inlined for better performance.
+    Added here for reference only. Addition may typically be inlined for better performance.
     """
     return a ^ b
 
@@ -33,7 +33,7 @@ def _multiply(a: int, b: int) -> int:
 def multiply(a: int, b: int) -> int:
     """Implements multiplication of `a` times `b` in GF256, i.e.,
     multiplication modulo the AES irreducible polynomial `x**8 + x**4 + x**3 + x + 1`.
-    Faster implementation using a pregenerated lookup table (64KB).
+    Faster implementation using a pregenerated lookup table (64KB in size).
     """
     return MULTIPLICATION_TABLE[(a << 8) | b]
 
@@ -68,11 +68,16 @@ INVERSE_LOOKUP_TABLE: bytes = init_inverse_lookup_table()
 
 
 class Polynomial:
-    def __init__(self, coefficients: Sequence[int]) -> None:
+    """ Holds the coefficients of a polynomial in GF256 and provides a function to evaluate the polynomial. 
+    Example usage: f = Polynomial([17, 124, 33]
+                   f(10) ==> 56
+    """
+
+    def __init__(self, coefficients: Union[bytes, Sequence[int]]) -> None:
         self.coefficients = coefficients
 
     def __call__(self, x: int) -> int:
-        """Evaluates this `t+1`-degree polynomial for this given input `x` in GF256.
+        """Evaluates this `t+1`-degree polynomial for the given input `x` in GF256.
         f(x) = c[0] + c[1] x + c[2] x^2 + ... + c[t-1] x^{t-1}
         """
         c = self.coefficients

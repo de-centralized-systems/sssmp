@@ -1,9 +1,16 @@
+""" Generates some test vectors by using the values of `pi` and `e` to determine the secrets to be shared and 
+coefficients used for the normally randomized secret sharing process.
+"""
+
 import itertools
 import json
 import pathlib
 
-from ssmp import GF256, coefficients_with_checksum, recover
 from typing import Any, Dict, List, Tuple
+
+import sssmp
+import GF256
+
 
 PI_BYTES = bytes.fromhex(
     "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89"
@@ -22,6 +29,7 @@ E_BYTES = bytes.fromhex(
     "04c324ef10de513d3f5114b8b5d374d93cb8879c7d52ffd72ba0aae7277da7ba"
 )
 
+
 fake_random_position = 0
 
 
@@ -29,7 +37,7 @@ def fake_random(b: int) -> bytes:
     global fake_random_position
     fake_random_bytes = E_BYTES[fake_random_position : fake_random_position + b]
     fake_random_position += b
-    assert len(fake_random_bytes) == b, "Provided random bytes exhausted."
+    assert len(fake_random_bytes) == b, "Provided fake random bytes exhausted."
     return fake_random_bytes
 
 
@@ -49,7 +57,7 @@ def generate_test_vector(s: bytes, n: int, t: int) -> Dict[str, Any]:
         elif 0 < j < t - 1:
             c[j] = fake_random(b)
         else:
-            c[j] = coefficients_with_checksum(s, fake_random(b - 8))
+            c[j] = sssmp.coefficients_with_checksum(s, fake_random(b - 8))
 
     f: List[GF256.Polynomial] = []
     for k in range(b):
@@ -63,7 +71,7 @@ def generate_test_vector(s: bytes, n: int, t: int) -> Dict[str, Any]:
 
     for tr in range(t, n + 1):
         for shares_for_recovery in itertools.combinations(shares, tr):
-            assert recover(shares_for_recovery) == s
+            assert sssmp.recover(shares_for_recovery) == s
 
     return {"s": s, "n": n, "t": t, "c": c, "shares": shares}
 
@@ -121,19 +129,22 @@ def generate_test_vectors() -> List[Dict[str, Any]]:
     return test_vectors
 
 
-if __name__ == "__main__":
-    target_dir = pathlib.Path(__file__).parent
-
+def main():
     print("Generating test vectors.")
     vectors = generate_test_vectors()
 
-    target = target_dir.joinpath("test_vectors.json")
-    print(f"Exporting test vectors to '{str(target)}'.")
-    with open(target, "w") as f:
+    target_dir = pathlib.Path(__file__).parent
+    target_json = target_dir.joinpath("test_vectors.json")
+    target_py = target_dir.joinpath("test_vectors.py")
+
+    print(f"Exporting test vectors to '{str(target_json)}'.")
+    with open(target_json, "w") as f:
         f.write(fmt_test_vectors_json(vectors))
 
-    target = target_dir.joinpath("test_vectors.py")
-    print(f"Exporting test vectors to '{str(target)}'.")
-    with open(target, "w") as f:
+    print(f"Exporting test vectors to '{str(target_py)}'.")
+    with open(target_py, "w") as f:
         f.write(fmt_test_vectors_python(vectors))
 
+
+if __name__ == "__main__":
+    main()
