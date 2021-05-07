@@ -11,8 +11,9 @@ Initial release: -
 
 ## Abstract 
 
-The document describes a secret sharing scheme with a particular focus on the use case of sharing random mnemonic 
-phrases, as for example used within hierarchical deterministic wallets in context of cryptocurrencies.
+This document describes a secret sharing scheme with a particular focus on the use case of sharing random mnemonic 
+phrases. 
+For example, this scheme may be used within the context of hierarchical deterministic (HD) cryptocurrency wallets.
 With this focus in mind, this specification is designed to be fully compatible with existing encodings of mnemonic 
 phrases, in particular [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki).
 It can be used to split a given (already existing) BIP39 mnemonic phrase of 12, 15, 18, 21, or 24 words, 
@@ -31,7 +32,7 @@ checksum mechanism, to the original secret sharing approach described by
 
 This document is not an official standard; it is published without any warranty for informational purposes and aims to: 
 consolidate community best practices, foster public review as well as contribution and 
-motivate the creation of official standards based on the here provided material. 
+motivate the creation of official standards based on the herein provided material. 
 
 Information about the current status of this document, any errata, and how to provide feedback on it may be obtained at
 [https://github.com/de-centralized-systems/sssmp](https://github.com/de-centralized-systems/sssmp).
@@ -59,28 +60,28 @@ they appear in all capitals, as shown here.
 The demand of deriving and managing an increasing number of secret keys has risen in recent years.
 This is mostly due to the widened adoption of cryptocurrencies and their increase in valuation. 
 These developments have fostered the creation of several different approaches to derive, encode and manage cryptographic 
-key material, within the respective community.
+keying material, within the respective community.
 
 This specification attempts to consolidate community best practices and well known and established cryptographic 
-techniques, in relation to the secret sharing of cryptographic key material.
-Therefore, key requirements and design goals are formulated and separated in into different layers and processing steps
-of managing and deriving cryptographic key material. 
-This should provide the necessary bigger picture and define the context in which this specification has to be 
+techniques, in relation to the secret sharing of cryptographic keying material.
+Therefore, core requirements and design goals are formulated and separated in into different layers and processing steps
+of managing and deriving cryptographic keying material. 
+This structure should provide the necessary bigger picture and define the context in which this specification has to be 
 interpreted. 
-The aim of this document is it to specify a minimalistic and interoperable method for the secret sharing of 
-cryptographic key material intended for manual/human processing, e.g., as used in private offline/paper backups of 
+The aim of this document is to specify a minimalistic and interoperable method for the secret sharing of 
+cryptographic keying material intended for manual/human processing, e.g., as used in private offline/paper backups of 
 mnemonic seed phrases. 
 
 ### <a name="Scope"></a>Scope, Goals and Non-goals
 
 To clarify the scope of this document, the relation to other processing steps in deriving and managing cryptographic 
-key material is outlined in the following.
+keying material is outlined in the following.
 
 * **Generation of a cryptographic key**
 At this point a new key $s$ is generated from a cryptographically secure source of randomness. 
-In most cases, this marks the first step in a hierarchically deterministic derivation of further key material. 
+In most cases, this marks the first step in a hierarchically deterministic derivation of further keying material. 
 Therefore, an initial key is sometimes also called *seed-key*. 
-This step is not within the scope of this document and MUST have taken place before the here specified scheme can be 
+This step is not within the scope of this document and MUST have taken place before the herein specified scheme can be 
 applied to a key $s$. 
 
 * **Derivation of a cryptographic key**
@@ -95,24 +96,25 @@ applied to a derived key $s$.
 A hidden derivation step can be applied to a generated, or derived, key $s_1$ to allow for hidden derivation paths, 
 plausible deniability through multiple derivation paths, or prevent the computation of subsequent derivation steps in 
 the key hierarchy. 
-Therefore, this step requires an additional secret/key $s_2$ as input, like for example a passphrase as in 
+Therefore, this step requires an additional secret/key $s_2$ as input, such as the utilization of a passphrase in 
 [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). 
-The additional user supplied passphrase is then used as a message in PBKDF2 with the reconstructed secret as password.
-This step is out-of-scope of this document and MAY be use in combination with the here specified scheme. 
+The additional user supplied passphrase is then used as a message in PBKDF2 with the reconstructed secret as the 
+password.
+This step is out-of-scope of this document and MAY be use in combination with the herein specified scheme. 
 For example, such a step can be applied after a secret has been reconstructed and before it is processed in further 
 derivation steps.
 
 * **Mnemonic encodeing/decodeing of a cryptographic key**
-A generated or derived key $s$ can be represented as a mnemonic phrase to improve human readability and easer manual 
-copying of key material or key shares. 
-Example for such schemes are 
+A generated or derived key $s$ can be represented as a mnemonic phrase to improve human readability and easier manual 
+copying of keying material or key shares. 
+Examples for such schemes are 
 [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki), or 
 [bytewords](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-012-bytewords.md).
-This step is out-of-scope of this document and such techniques SHOULD be used in combination with the here specified 
+This step is out-of-scope of this document and such techniques SHOULD be used in combination with the herein specified 
 scheme. 
 
 * **Secret sharing of a cryptographic key**
-A generated or derived key $s$ is shared amongst a set of $n$ participants, where $t$ should be able to reconstruct 
+A generated or derived key $s$ is shared among a set of $n$ participants, where $t$ should be able to reconstruct 
 the original key $s$. 
 In this specification we focus exclusively on this step.
 
@@ -127,11 +129,11 @@ In this specification we focus exclusively on this step.
 
 ### Background
 
-This specification is based on classical [Shamir Secret Sharing](https://dl.acm.org/doi/pdf/10.1145/359168.359176) 
+This specification is based on [Shamir Secret Sharing](https://dl.acm.org/doi/pdf/10.1145/359168.359176) 
 (SSS) and adds a checksum mechanism in the construction step.
 The added checksum does not affect the reconstruction of classical SSS if it is not checked. 
-The specified scheme is intended to share high min-entropy cryptographic key material, i.e., a secret $s$, 
-amongst a set of $n$ participants, such that at least $t$ are required to reconstruct the original secret $s$. 
+The specified scheme is intended to share high min-entropy cryptographic keying material, i.e., a secret $s$, 
+among a set of $n$ participants, such that at least $t$ are required to reconstruct the original secret $s$. 
 A detailed comparison between related implementations of secret sharing schemes based on SSS and utilized in this 
 context of cryptocurrencies (like
 [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki),
@@ -141,7 +143,7 @@ is out of scope of this document.
 
 ### Notation and Symbols
 
-The following tables provides an overview of the used notation in the reminder of this document.
+The following table provides an overview of the used notation in the remainder of this document.
 
 | Symbol                  | Description                                                                                                                                                                                                   |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -191,7 +193,7 @@ This allows for a simple and efficient implementation using the finite field $\t
 In this field addition and subtraction of two field elements (two bytes) are defined using the bitwise xor operation.
 Multiplication of two field elements (again two bytes) is defined using the
 AES reducing polynomial $x^8 + x^4 + x^3 + x + 1$. 
-For additional background information regarding finite field arithmetics we refer to the
+For additional background information regarding finite field arithmetic we refer the reader to the
 [Wikipedia page on Finite Field Arithmetic](https://en.wikipedia.org/wiki/Finite_field_arithmetic).
 The used secret sharing polynomials $f_0(\cdot), f_1(\cdot), \dots, f_{b-1}(\cdot)$ of degree $t - 1$
 are evaluated over $\text{GF}(2^8)$:
@@ -247,8 +249,8 @@ This section describes how to reconstruct a secret from a set of $t$ given share
 computed with the method specified in [Section Sharing](#Sharing).
 Implementations MUST be able to successfully recover the shared secret $s$, if all given shares are 
 *valid* and a *sufficient number* of shares is provided. 
-* A share is considered valid if it was generated according this specification.
-* The number of shares provided is sufficient if it matches or exceeds the secret sharing threshold used during the 
+* A share is considered valid, if it was generated according this specification.
+* The number of shares provided is sufficient, if it matches or exceeds the secret sharing threshold used during the 
   sharing process.
 
 Implementation MAY provide additional functionality to aid with the recovery process in case invalid shares are 
@@ -315,9 +317,10 @@ In order to verify this checksum,
 first the value of the coefficients $c_{t - 1}$ are computed 
 from the set of $t$ shares $\{(x_1, y_1), (x_2, y_2), \dots, (x_t, y_t)\}$ 
 supplied for the recovery process. 
-This, e.g., MAY be accomplished using the [schemata of diving differences](https://de.wikipedia.org/wiki/Polynominterpolation#Bestimmung_der_Koeffizienten:_Schema_der_dividierten_Differenzen) 
+This, e.g., MAY be accomplished using the 
+[schemata of divided differences](https://en.wikipedia.org/wiki/Divided_differences) 
 illustrated in the following.
-The process of recovering the values of the coefficients $c_{t - 1}$ using the schemata of diving differences, 
+The process of recovering the values of the coefficients $c_{t - 1}$ using the schemata of divided differences, 
 as the secret sharing process itself, is performed on a byte-per-byte basis 
 for each byte in the list of coefficients $c_{t - 1}$ using $k$ as index variable:
 $$
@@ -344,7 +347,7 @@ $$
   r = c_{t - 1}[: b-8]  \\
   c_{t - 1} \overset{?}{=} \textsf{coefficients\_with\_checksum}(s, r).
 $$
-The checksum is valid if and only if the above equality holds.
+The checksum is valid if, and only if, the above equality holds.
 If the checksum is found valid, the value $s$ is returned as result of the recovery process. 
 Otherwise the user MUST be informed of the failed recovery attempt. 
 In this case, implementations MAY choose to return the recovery secret $s$ anyway, but they MUST NOT do so without
@@ -364,9 +367,9 @@ This secret sharing session identifier SHOULD be written down together with the 
 as its index. 
 This ensures that shares of multiple different sessions do not get mixed and thus confused with each other.
 
-Note that, if shares of multiple different sessions with large $n$ values get mixed, this might lead to a
+Note that, if shares of multiple different sessions with large $n$ values become mixed, this might lead to a
 situation where it is no longer computationally feasible to perform a brute-force search to find the valid combinations 
-which allow for the reconstruction of the original secrets. 
+that allow for the reconstruction of the original secrets. 
 
 ### Minimal secret size and intended use case
 
@@ -379,8 +382,8 @@ our variant (due to the inclusion of an integrated checksum) is not designed for
 may become insecure under these circumstances.
 Also this specification MUST NOT be used as basis for an implementation for secret sharing of arbitrary data.
 It is instead intended to share cryptographic secrets with a minimum of $128$ bits of entropy.
-If against this rule, a very low entropy secret would be shared, the inclusion of a $64$ bit checksum may allow an 
-attacker with possession of $t - 1$ shares to brute-force the shared secret, using the checksum at means to verify 
+If against this rule, a very low entropy secret were to be shared, the inclusion of a $64$ bit checksum may allow an 
+attacker with possession of $t - 1$ shares to brute-force the shared secret, using the checksum as a means to verify 
 if a guess of the secret is correct.
 
 To share arbitrary data, it is RECOMMENDED to encrypt the data using a suitable (symmetric) encryption algorithm 
@@ -389,7 +392,7 @@ and only share the (symmetric) encryption key using the method specified in this
 ### Checksum
 
 The specification defines the secret sharing process on the level of bytes. 
-It it intended to be used with encoding schemes such as
+It is intended to be used with encoding schemes such as
 [BIP39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) or 
 [Bytewords](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-012-bytewords.md) to
 encode/decode the in- and outputs. 
@@ -407,19 +410,19 @@ These cases include, the following scenarios:
 - One or more parties deliberately crafts correct-looking shares with invalid share values to prevent the 
   recovering entity to learn the originally shared secret.
 
-In both cases, the recovery process would silently return some recovered secret, 
-which is different to the secret originally shared, when no additional countermeasures are implemented.
-It is strongly desirable to detect, and potentially be able to recover from, these scenarios.
-Therefore, this specification includes a checksum mechanism, by deriving this last coefficient for the secret sharing 
-polynomial is a special way. 
+In both cases the recovery process would fail silently resulting in a recovered secret 
+that is different to the secret originally shared, if no additional countermeasures are implemented.
+It is highly desirable to detect, and potentially be able to recover from, these scenarios.
+Therefore, this specification includes a checksum mechanism, by deriving the last coefficient of the secret sharing 
+polynomial in a specific way. 
 While there are many different approaches to cover these scenarios, the approach used in this specification achieves a 
 range of desirable properties while minimizing potential drawbacks:
  - For the sharing process, only a minor modification to the way the last secret sharing coefficients are derived is needed.
  - The recovery process is unchanged compared to classical SSS and independent of the verification process of the included checksum.
  - The size of the generated shares does not increase and is equal to the size of the secret to be shared. 
- - A low false negative rate of $2^{-64}$, where a invalid recovered secret can pass the verification process unnoticed.
+ - It has a low false negative rate of $2^{-64}$, where an invalid recovered secret may pass the checksum verification process unnoticed.
 
-A theoretical drawback is the lost of information theoretical security as the value of $c_{t - 1}$  includes 
+A theoretical drawback is the loss of information theoretical security as the value of $c_{t - 1}$  includes 
 a $64$ bit checksum, derived cryptographically from 
 (i) the secret to shared and 
 (ii) at least 64 additional bits of entropy. 
@@ -428,13 +431,13 @@ a $64$ bit checksum, derived cryptographically from
 ### Compatibility and Separation of Concerns
 
 The specification is intentionally designed such that it can be used with different mnemonic schemes and different key 
-derivation schemes building on top of the shared cryptographic key material. 
+derivation schemes building on top of the shared cryptographic keying material. 
 This approach follows the separation of concerns principle as 
 *generation*, *derivation*, *mnemonic encoding/decoding* and *secret sharing* of cryptographic key material are separate 
 tasks and can thus be defined and implemented separately (see Section [Scope](#Scope) for more details).
-As long as the intermediate formats are well defined this loose coupling allows for easier replacement and updates of 
+As long as the intermediate formats are well defined, this loose coupling allows for easier replacement and updates of 
 individual components in software stacks and tool chains. 
-The document at hand specifies a method for secret sharing of cryptographic key material. 
+The document at hand specifies a method for secret sharing of cryptographic keying material. 
 
 
 ### Sharing the same secret multiple times
@@ -467,7 +470,7 @@ and/or further sharing shares of a shared secret.
 
 We consider this as an advanced use case, and in contrast to, e.g., 
 the [SLIP39](https://github.com/satoshilabs/slips/blob/master/slip-0039.md) proposal, 
-deliberately do not complicate this specification by introducing additionally a notation for groups to explicitly 
+deliberately do not complicate this specification by introducing an additional notation for groups to explicitly 
 capture such use cases.
 Yet, our specification transparently allows to re-share the shares for a given secret in a natural way: 
 This is simply accomplished by feeding a share, which should be further split up, as secret into the secret sharing 
@@ -478,7 +481,7 @@ our approach in principle allows for an arbitrary number of nested secret sharin
 
 ### The use of $\mathbf{GF(2^8)}$
 This design performs all secret sharing and recovery computations in the finite field $\text{GF}(2^8)$. 
-The allows the specified algorithms to process the data on a byte-per-byte level and simplified implementation in 
+This allows the specified algorithms to process the data on a byte-per-byte level and simplifies implementations in 
 programming languages or on hardware platform with no immediate support for arbitrary precision integer arithmetics.
 Using this approach, share indices are restricted to integers from $1$ to $255$.
 Thus the maximum number of shares is limited to $255$.
@@ -516,7 +519,7 @@ An example test vector is given below:
 The test vectors include secret sharing examples for all values of $1 \leq t \leq n \leq 5$.
 As the secret sharing process is inherently randomized, the values of the coefficients used for the secret sharing 
 process are given in the test vectors.
-This allows other implementation to check if the secret sharing leads to the expected shares for the given coefficients.
+This allows other implementations to check if the secret sharing leads to the expected shares for the given coefficients.
 The last 8 bytes of the coefficients in the test vectors are computed according to this specification and can be used
 to check the correctness of the checksum computation.
 Implementations MUST NOT use the provided values for purposes other than testing the correctness of the implementation.
@@ -530,9 +533,9 @@ All implementation MUST support the following functionality as specified later i
 
 Implementations MAY support additionally support functionality to aid the recovery process 
 in the following circumstances given as non-exhaustive list below:
-  1. Recovery from a set $v \leq t$ valid shares, even if the underlying secret sharing threshold $t$ is unknown.
-  2. Recovery from a set shares, given that at least $t$ valid shares are provided.
-  3. Recovery in case, share indices are missing or invalid.
+  1. Recovery from a set of $v \leq t$ valid shares, even if the underlying secret sharing threshold $t$ is unknown.
+  2. Recovery from a set of shares, given that at least $t$ valid shares are provided.
+  3. Recovery in case share indices are missing or invalid.
   4. Combinations of the above issues.
 
 Depending on the number of shares $n$ and the secret sharing threshold $t$ used, in particular for small values, 
@@ -570,5 +573,3 @@ Moreover it supports the generation of cryptographic keys from scratch.
 
 **2021-05-07**
  - Initial draft published on Github.
-
-

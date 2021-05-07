@@ -109,8 +109,9 @@ def recover_checksum_coefficients(shares: Sequence[Tuple[int, bytes]]) -> Option
     """Computes the last coefficients (index > 0) of the underlying secret sharing polynomials defined by the given
     shares by using the recursive definition of dividing differences.
 
-    Link to German wikipedia:
+    Link to German and English wikipedia articles:
     https://de.wikipedia.org/wiki/Polynominterpolation#Bestimmung_der_Koeffizienten:_Schema_der_dividierten_Differenzen
+    https://en.wikipedia.org/wiki/Divided_differences
 
     Let, e.g., [(x0, y0), (x1, y1), ..., (x4, y4)] denote the shares.
     The last cofficients of the polynomials defined by these shares is given as the bottom right value of the
